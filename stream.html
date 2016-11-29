@@ -1,0 +1,71 @@
+<!DOCTYPE html> <meta charset="utf-8"> <style>
+
+path {
+  stroke: #000;
+  fill-opacity: .8;
+}
+
+</style> <body> 
+<script src="https://d3js.org/d3.v3.min.js"></script> 
+<script src="http://d3js.org/topojson.v1.min.js"></script> 
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script>
+
+var width = 160,
+    height = 500;
+
+var m = 5, // number of series
+    n = 12; // number of values
+
+queue()
+  .defer(d3.csv, 'price.csv')
+  .await(makeMyMap);
+
+function makeMyMap(error,price){
+// Generate random data into five arrays.
+var input=[];
+
+price.forEach(function(d){
+          if (d.SC_Attribute_Desc=="Prices, market"){
+            if (d.SC_GroupCommod_Desc=="Barley"){
+              if (d.Year_ID=="2004"){
+               input.push(Number(d.Amount))
+            }
+                       
+              }
+            } 
+          })
+
+console.log(input)
+
+
+
+var x = d3.scale.linear()
+    .domain([0, n - 1])
+    .range([0, width]);
+
+var y = d3.scale.ordinal()
+    .domain(d3.range(m))
+    .rangePoints([0, height], 1);
+
+var color = d3.scale.ordinal()
+    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+
+var area = d3.svg.area()
+    .interpolate("basis")
+    .x(function(d, i) { return x(i); })
+    .y0(function(d) { return -(d-1.5)*120 / 2; })
+    .y1(function(d) { return 0; });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.selectAll("path")
+    .data([input])
+  .enter().append("path")
+    .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; })
+    .style("fill", function(d, i) { return color(i); })
+    .attr("d", area);
+}
+</script>
