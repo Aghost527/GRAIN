@@ -56,7 +56,7 @@
 
     d3.json("worldmap.json", function(data) {
       /* Antarctica will not shown on the map */
-      var features =features.filter(data.features, function(value, key) {
+      var features =data.features.filter(function(value, key) {
         return value.properties.name != 'Antarctica';
       });
 
